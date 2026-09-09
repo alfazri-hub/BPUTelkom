@@ -1,11 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Loader2, Upload } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { hasAdminSession } from "@/lib/admin-session";
+import { PortalShell } from "@/app/components/app-shell";
+
+const safeFileName = (name: string) =>
+  name.replace(/[^a-zA-Z0-9._-]/g, "-").slice(-60);
 
 export default function InputData() {
   const router = useRouter();
+  const [allowed, setAllowed] = useState(false);
   const [nomorReferensi, setNomorReferensi] = useState("");
   const [tanggal, setTanggal] = useState("");
   const [dpp, setDpp] = useState("");
@@ -14,22 +22,31 @@ export default function InputData() {
   const [nomorAkun, setNomorAkun] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  useEffect(() => {
+    if (!hasAdminSession()) {
+      router.replace("/login");
+      return;
+    }
+    setAllowed(true);
+  }, [router]);
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!file) return;
 
     setStatus("proses");
 
-    const fileExt = file.name.split(".").pop();
-    const fileName = `${Math.random()}.${fileExt}`;
+    const fileName = `${Date.now()}-${safeFileName(file.name)}`;
 
     const { error: uploadError } = await supabase.storage
       .from("pdfs")
       .upload(fileName, file);
 
     if (uploadError) {
-      setStatus("gagal");
+      console.error(uploadError);
+      setStatus("gagal-unggah");
       return;
     }
 
@@ -50,7 +67,8 @@ export default function InputData() {
     ]);
 
     if (insertError) {
-      setStatus("gagal");
+      console.error(insertError);
+      setStatus("gagal-simpan");
       return;
     }
 
@@ -62,110 +80,207 @@ export default function InputData() {
     setUnitKerja("");
     setNomorAkun("");
     setFile(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
+  if (!allowed) return null;
+
+  const isSaving = status === "proses";
+
   return (
-    <main className="min-h-screen bg-portal-paper px-4 py-5 sm:px-6">
-      <div className="mx-auto w-full max-w-2xl rounded-3xl border border-portal-line bg-portal-paper p-6 shadow-xl shadow-portal-ink/10 sm:p-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="shader-heading text-3xl font-extrabold tracking-tight">
-            Input Dokumen Baru
+    <PortalShell admin>
+      <main className="shell page-body flex-1">
+        <div className="mx-auto w-full max-w-3xl">
+          <h1 className="text-2xl font-semibold tracking-tight text-ink">
+            Input dokumen baru
           </h1>
-          <button
-            onClick={() => router.push("/admin")}
-            className="shader-button shader-button--light rounded-full px-4 py-2 text-xs"
-          >
-            Kembali
-          </button>
-        </div>
+          <p className="mt-1.5 text-sm text-ink-2">
+            Seluruh kolom wajib diisi. Dokumen langsung muncul di halaman
+            pencarian setelah tersimpan.
+          </p>
 
-        {status === "sukses" && (
-          <div className="mb-6 rounded-xl border border-portal-line bg-portal-paper2 p-4 text-center font-medium text-portal-ink">
-            Data dan PDF berhasil disimpan!
-          </div>
-        )}
+          <form onSubmit={handleSubmit} className="mt-8">
+          {status === "sukses" && (
+            <div className="notice notice-ok mb-6">
+              <p className="font-semibold">Dokumen tersimpan.</p>
+              <p className="mt-1">
+                Berkas dan datanya sudah masuk arsip.{" "}
+                <Link
+                  href="/admin/data"
+                  className="font-semibold underline underline-offset-2"
+                >
+                  Periksa di Kelola data
+                </Link>
+                , atau lanjutkan mengisi dokumen berikutnya.
+              </p>
+            </div>
+          )}
 
-        {status === "gagal" && (
-          <div className="mb-6 rounded-xl border border-portal-line bg-portal-red-soft p-4 text-center font-medium text-portal-red">
-            Terjadi kesalahan saat menyimpan data.
-          </div>
-        )}
+          {status === "gagal-unggah" && (
+            <div className="notice notice-error mb-6">
+              <p className="font-semibold">Berkas PDF gagal diunggah.</p>
+              <p className="mt-1">
+                Data belum tersimpan. Pastikan ukuran berkas wajar dan koneksi
+                stabil, lalu kirim ulang formulir ini.
+              </p>
+            </div>
+          )}
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <input
-              type="text"
-              value={nomorReferensi}
-              onChange={(e) => setNomorReferensi(e.target.value)}
-              placeholder="Nomor Referensi"
-              required
-              className="shader-control w-full rounded-full px-5 py-3.5 text-sm outline-none"
-            />
-            <input
-              type="date"
-              value={tanggal}
-              onChange={(e) => setTanggal(e.target.value)}
-              required
-              className="shader-control w-full rounded-full px-5 py-3.5 text-sm outline-none"
-            />
-            <input
-              type="number"
-              value={dpp}
-              onChange={(e) => setDpp(e.target.value)}
-              placeholder="Dasar Pengenaan Pajak"
-              required
-              className="shader-control w-full rounded-full px-5 py-3.5 text-sm outline-none"
-            />
-            <input
-              type="number"
-              value={pph}
-              onChange={(e) => setPph(e.target.value)}
-              placeholder="PPh Terhutang"
-              required
-              className="shader-control w-full rounded-full px-5 py-3.5 text-sm outline-none"
-            />
-            <input
-              type="text"
-              value={unitKerja}
-              onChange={(e) => setUnitKerja(e.target.value)}
-              placeholder="Nama Unit Kerja"
-              required
-              className="shader-control w-full rounded-full px-5 py-3.5 text-sm outline-none"
-            />
-            <input
-              type="text"
-              value={nomorAkun}
-              onChange={(e) => setNomorAkun(e.target.value)}
-              placeholder="Nomor Akun"
-              required
-              className="shader-control w-full rounded-full px-5 py-3.5 text-sm outline-none"
-            />
-          </div>
+          {status === "gagal-simpan" && (
+            <div className="notice notice-error mb-6">
+              <p className="font-semibold">Data dokumen gagal disimpan.</p>
+              <p className="mt-1">
+                Berkas sudah terunggah, tetapi datanya belum tercatat. Periksa
+                kembali isian tanggal dan nominal, lalu kirim ulang.
+              </p>
+            </div>
+          )}
 
-          <div className="flex flex-col gap-2 mt-2">
-            <label className="shader-label px-2 font-medium">
-              Upload File PDF
+          <fieldset className="sheet p-6">
+            <legend className="px-2 text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-ink-2">
+              Identitas dokumen
+            </legend>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div>
+                <label htmlFor="nomor-referensi" className="field-label">
+                  Nomor referensi
+                </label>
+                <input
+                  id="nomor-referensi"
+                  type="text"
+                  value={nomorReferensi}
+                  onChange={(e) => setNomorReferensi(e.target.value)}
+                  required
+                  className="field-box num"
+                />
+              </div>
+              <div>
+                <label htmlFor="tanggal" className="field-label">
+                  Tanggal bukti potong
+                </label>
+                <input
+                  id="tanggal"
+                  type="date"
+                  value={tanggal}
+                  onChange={(e) => setTanggal(e.target.value)}
+                  required
+                  className="field-box"
+                />
+              </div>
+              <div>
+                <label htmlFor="unit-kerja" className="field-label">
+                  Nama unit kerja
+                </label>
+                <input
+                  id="unit-kerja"
+                  type="text"
+                  value={unitKerja}
+                  onChange={(e) => setUnitKerja(e.target.value)}
+                  required
+                  className="field-box"
+                />
+              </div>
+              <div>
+                <label htmlFor="nomor-akun" className="field-label">
+                  Nomor akun
+                </label>
+                <input
+                  id="nomor-akun"
+                  type="text"
+                  value={nomorAkun}
+                  onChange={(e) => setNomorAkun(e.target.value)}
+                  required
+                  className="field-box num"
+                />
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset className="sheet mt-5 p-6">
+            <legend className="px-2 text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-ink-2">
+              Nilai pajak
+            </legend>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div>
+                <label htmlFor="dpp" className="field-label">
+                  Dasar pengenaan pajak (Rp)
+                </label>
+                <input
+                  id="dpp"
+                  type="number"
+                  min="0"
+                  step="1"
+                  inputMode="numeric"
+                  value={dpp}
+                  onChange={(e) => setDpp(e.target.value)}
+                  required
+                  className="field-box num"
+                />
+              </div>
+              <div>
+                <label htmlFor="pph" className="field-label">
+                  PPh terhutang (Rp)
+                </label>
+                <input
+                  id="pph"
+                  type="number"
+                  min="0"
+                  step="1"
+                  inputMode="numeric"
+                  value={pph}
+                  onChange={(e) => setPph(e.target.value)}
+                  required
+                  className="field-box num"
+                />
+              </div>
+            </div>
+            <p className="mt-3 text-[0.8125rem] text-ink-2">
+              Masukkan angka tanpa titik atau koma pemisah ribuan.
+            </p>
+          </fieldset>
+
+          <fieldset className="sheet mt-5 p-6">
+            <legend className="px-2 text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-ink-2">
+              Berkas bukti potong
+            </legend>
+            <label htmlFor="berkas" className="field-label">
+              Unggah berkas PDF
             </label>
             <input
+              id="berkas"
+              ref={fileInputRef}
               type="file"
               accept="application/pdf"
-              onChange={(e) =>
-                setFile(e.target.files ? e.target.files[0] : null)
-              }
+              onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)}
               required
-              className="shader-file w-full rounded-2xl border border-portal-line bg-portal-paper px-4 py-3 text-sm text-portal-muted"
+              className="field-box cursor-pointer py-2.5 text-sm file:mr-3 file:border file:border-rule file:bg-desk file:px-3 file:py-1.5 file:text-[0.8125rem] file:font-semibold file:text-ink hover:file:border-ink"
             />
-          </div>
+            <p className="mt-3 text-[0.8125rem] text-ink-2">
+              Hanya berkas PDF. Berkas inilah yang dibuka pengguna dari halaman
+              pencarian.
+            </p>
+          </fieldset>
 
-          <button
-            type="submit"
-            disabled={status === "proses"}
-            className="shader-button shader-button--accent mt-6 w-full rounded-full px-6 py-4 text-sm text-portal-paper disabled:opacity-50"
-          >
-            {status === "proses" ? "Menyimpan..." : "Simpan Data & Upload PDF"}
-          </button>
-        </form>
-      </div>
-    </main>
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            <button
+              type="submit"
+              disabled={isSaving}
+              className="btn btn-primary"
+            >
+              {isSaving ? (
+                <Loader2 size={16} className="animate-spin" aria-hidden="true" />
+              ) : (
+                <Upload size={16} aria-hidden="true" />
+              )}
+              {isSaving ? "Menyimpan" : "Simpan dokumen"}
+            </button>
+            <Link href="/admin" className="btn btn-quiet">
+              Batal
+            </Link>
+          </div>
+          </form>
+        </div>
+      </main>
+    </PortalShell>
   );
 }

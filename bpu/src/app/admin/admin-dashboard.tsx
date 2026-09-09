@@ -1,64 +1,91 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FileText, PlusCircle } from "lucide-react";
-import { Eyebrow } from "@/app/components/portal-ui";
-import { PortalNavigation } from "@/app/components/navigation-bar";
+import { ArrowRight } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+import { hasAdminSession } from "@/lib/admin-session";
+import { PortalShell } from "@/app/components/app-shell";
 
 export default function AdminDashboard() {
   const router = useRouter();
+  const [allowed, setAllowed] = useState(false);
+  const [total, setTotal] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!hasAdminSession()) {
+      router.replace("/login");
+      return;
+    }
+    setAllowed(true);
+
+    supabase
+      .from("documents")
+      .select("id", { count: "exact", head: true })
+      .then(({ count }) => setTotal(count ?? 0));
+  }, [router]);
+
+  if (!allowed) return null;
 
   return (
-    <main className="portal-page min-h-screen bg-portal-paper2">
-      <PortalNavigation admin />
-      <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-14">
-        <div className="mb-10">
-          <Eyebrow>Ruang admin</Eyebrow>
-          <h1 className="portal-display mt-3 text-3xl font-semibold text-portal-navy sm:text-4xl">
-            Dashboard pengelola
-          </h1>
-          <p className="mt-2 text-sm text-portal-muted">
-            Pilih menu di navbar atau kartu di bawah untuk mengelola dokumen
-            pajak.
-          </p>
-        </div>
-        <div className="grid gap-5 sm:grid-cols-2">
-          <button
-            type="button"
-            onClick={() => router.push("/admin/input")}
-            className="portal-card group p-7 text-left transition hover:-translate-y-1 hover:border-portal-red hover:shadow-lg"
+    <PortalShell admin>
+      <main className="shell page-body flex-1">
+        <h1 className="text-2xl font-semibold tracking-tight text-ink">
+          Ruang admin
+        </h1>
+        <p className="mt-1.5 text-sm text-ink-2">
+          Kelola arsip bukti potong pajak yang tampil di halaman pencarian.
+        </p>
+
+        <div className="sheet mt-8 divide-y divide-rule-soft">
+          <Link
+            href="/admin/input"
+            className="group flex items-center justify-between gap-6 px-6 py-5 transition-colors hover:bg-[#faf9f6]"
           >
-            <PlusCircle
-              className="mb-6 text-portal-red"
-              size={32}
-              strokeWidth={1.5}
+            <span>
+              <span className="block text-base font-semibold text-ink">
+                Input dokumen baru
+              </span>
+              <span className="mt-1 block text-sm text-ink-2">
+                Isi data administrasi pajak dan unggah berkas PDF bukti potong.
+              </span>
+            </span>
+            <ArrowRight
+              size={18}
+              aria-hidden="true"
+              className="shrink-0 text-ink-2 transition-colors group-hover:text-rubric"
             />
-            <h2 className="portal-display text-xl font-semibold text-portal-navy">
-              Input dokumen baru
-            </h2>
-            <p className="mt-2 text-sm leading-6 text-portal-muted">
-              Unggah bukti potong pajak dan lengkapi data administrasi.
-            </p>
-          </button>
-          <button
-            type="button"
-            onClick={() => router.push("/admin/data")}
-            className="portal-card group p-7 text-left transition hover:-translate-y-1 hover:border-portal-red hover:shadow-lg"
+          </Link>
+
+          <Link
+            href="/admin/data"
+            className="group flex items-center justify-between gap-6 px-6 py-5 transition-colors hover:bg-[#faf9f6]"
           >
-            <FileText
-              className="mb-6 text-portal-red"
-              size={32}
-              strokeWidth={1.5}
+            <span>
+              <span className="block text-base font-semibold text-ink">
+                Kelola data
+              </span>
+              <span className="mt-1 block text-sm text-ink-2">
+                Periksa, koreksi, buka berkas, atau hapus dokumen tersimpan
+                {total !== null && (
+                  <>
+                    {" — "}
+                    <span className="num font-medium text-ink">{total}</span>{" "}
+                    dokumen dalam arsip
+                  </>
+                )}
+                .
+              </span>
+            </span>
+            <ArrowRight
+              size={18}
+              aria-hidden="true"
+              className="shrink-0 text-ink-2 transition-colors group-hover:text-rubric"
             />
-            <h2 className="portal-display text-xl font-semibold text-portal-navy">
-              Kelola data
-            </h2>
-            <p className="mt-2 text-sm leading-6 text-portal-muted">
-              Lihat, edit, buka, atau hapus dokumen yang tersimpan.
-            </p>
-          </button>
+          </Link>
         </div>
-      </div>
-    </main>
+      </main>
+    </PortalShell>
   );
 }
