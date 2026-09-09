@@ -2,7 +2,327 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --ink: #14172b;
+  --navy: #10132a;
+  --muted: #75798c;
+  --line: #e7e4dd;
+  --accent: #d93a46;
+  --accent-soft: rgba(217, 58, 70, 0.08);
+  --paper: #ffffff;
+  --paper-alt: #f7f6f2;
+}
+
+* {
+  box-sizing: border-box;
+}
 body {
-  color: #333333;
-  background-color: #ffffff;
+  margin: 0;
+  color: var(--ink);
+  background: #fff;
+  font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+}
+button,
+input {
+  font: inherit;
+}
+button {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: wait;
+}
+.shader-page {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.shader-background {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  min-height: 100%;
+  overflow: hidden;
+  background: #fff;
+}
+.shader-background__canvas {
+  position: absolute !important;
+  inset: -8%;
+  width: 116% !important;
+  height: 116% !important;
+  opacity: 0.95;
+}
+.shader-page::after {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    rgba(18, 13, 23, 0.2),
+    rgba(18, 13, 23, 0.06)
+  );
+  content: "";
+  pointer-events: none;
+}
+.shader-control {
+  border: 1px solid var(--line) !important;
+  background: var(--paper-alt) !important;
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  color: var(--ink) !important;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
+}
+.shader-control::placeholder {
+  color: #98a2b3;
+}
+.shader-control:focus {
+  border-color: var(--accent) !important;
+  background: #fff !important;
+  box-shadow:
+    0 0 0 4px rgba(217, 58, 70, 0.12),
+    0 10px 26px rgba(18, 13, 23, 0.1);
+  outline: none;
+}
+.shader-button {
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  box-shadow:
+    0 10px 22px rgba(18, 13, 23, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  font-weight: 800;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
+}
+.shader-button:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 14px 28px rgba(18, 13, 23, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+.shader-button:active {
+  transform: translateY(0) scale(0.98);
+}
+.shader-button--accent {
+  background: var(--accent) !important;
+}
+.shader-button--accent:hover {
+  background: #b92d3a !important;
+}
+.shader-button--dark {
+  background: #172033 !important;
+}
+.shader-button--dark:hover {
+  background: #0d111c !important;
+}
+.shader-button--light {
+  border-color: #cbd5e1 !important;
+  background: #fff !important;
+  color: #475569 !important;
+}
+.shader-button--light:hover {
+  border-color: #e43d4b !important;
+  background: #fff5f6 !important;
+  color: #e43d4b !important;
+}
+.shader-file::file-selector-button {
+  cursor: pointer;
+  border: 0;
+  border-radius: 999px;
+  background: #172033;
+  padding: 0.65rem 1rem;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+.app-shell {
+  background: #fff;
+}
+.auth-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+.auth-intro {
+  background: linear-gradient(145deg, #123d46, #0f766e 58%, #ef765b);
+}
+.brand-mark {
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.08em;
+}
+.brand-mark span {
+  color: var(--coral);
+}
+.eyebrow {
+  color: var(--accent);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.field-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  color: #344054;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+.field-input {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 0.9rem;
+  background: #fbfcfd;
+  padding: 0.9rem 1rem;
+  color: var(--ink);
+  outline: none;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+.field-input::placeholder {
+  color: #98a2b3;
+}
+.field-input:focus {
+  border-color: #52a39c;
+  box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.12);
+}
+.primary-button {
+  border: 0;
+  border-radius: 0.9rem;
+  background: var(--accent);
+  padding: 0.95rem 1.25rem;
+  color: white;
+  font-weight: 800;
+  transition:
+    background 0.2s,
+    transform 0.2s;
+}
+.primary-button:hover {
+  background: var(--accent-dark);
+  transform: translateY(-1px);
+}
+.primary-button:disabled {
+  opacity: 0.65;
+  transform: none;
+}
+.status-error {
+  border-radius: 0.75rem;
+  background: #fff1f0;
+  padding: 0.75rem 1rem;
+  color: #c2413a;
+  font-size: 0.84rem;
+}
+.shader-surface {
+  border: 1px solid var(--line);
+  background: var(--paper);
+  box-shadow:
+    0 14px 34px rgba(15, 23, 42, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  color: #172033;
+}
+.portal-page {
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+}
+.portal-display {
+  font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+}
+.portal-logo {
+  display: inline-flex;
+  align-items: center;
+  background: var(--accent);
+  padding: 0.25rem 0.55rem;
+  color: white;
+  font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+.eyebrow-pill {
+  display: inline-flex;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  padding: 0.3rem 0.65rem;
+  color: var(--accent);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+.perforation {
+  display: flex;
+  gap: 0.375rem;
+  overflow: hidden;
+  padding: 0 1.25rem;
+}
+.perforation span {
+  width: 0.25rem;
+  height: 0.25rem;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: var(--line);
+}
+.portal-card {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: var(--paper);
+}
+.portal-card-body {
+  padding: 1.5rem;
+}
+.portal-section-label {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+.portal-icon-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--ink);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+.portal-icon-button:hover {
+  color: var(--accent);
+}
+.portal-input {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  background: var(--paper-alt);
+  padding: 0.7rem 0.875rem;
+  color: var(--ink);
+  font-size: 0.875rem;
+  outline: none;
+}
+.portal-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.portal-label {
+  color: var(--ink);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+.shader-heading {
+  color: #172033 !important;
+}
+.shader-muted {
+  color: #64748b !important;
+}
+.shader-label {
+  color: #334155 !important;
+}
+@media (max-width: 767px) {
+  .auth-layout {
+    display: block;
+  }
 }
