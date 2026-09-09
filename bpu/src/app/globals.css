@@ -2,6 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+@theme {
+  --color-portal-red: var(--accent);
+  --color-portal-red-soft: var(--accent-soft);
+  --color-portal-red-soft-strong: var(--accent-soft-strong);
+  --color-portal-navy: var(--navy);
+  --color-portal-navy2: var(--navy2);
+  --color-portal-ink: var(--ink);
+  --color-portal-paper: var(--paper);
+  --color-portal-paper2: var(--paper-alt);
+  --color-portal-line: var(--line);
+  --color-portal-muted: var(--muted);
+}
+
 :root {
   --ink: #14172b;
   --navy: #10132a;
@@ -9,6 +22,7 @@
   --line: #e7e4dd;
   --accent: #d93a46;
   --accent-soft: rgba(217, 58, 70, 0.08);
+  --accent-soft-strong: rgba(217, 58, 70, 0.14);
   --paper: #ffffff;
   --paper-alt: #f7f6f2;
 }
@@ -19,8 +33,8 @@
 body {
   margin: 0;
   color: var(--ink);
-  background: #fff;
-  font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  background: var(--paper);
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
 }
 button,
 input {
@@ -32,44 +46,12 @@ button {
 button:disabled {
   cursor: wait;
 }
-.shader-page {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-}
-.shader-background {
-  position: absolute;
-  z-index: -1;
-  inset: 0;
-  min-height: 100%;
-  overflow: hidden;
-  background: #fff;
-}
-.shader-background__canvas {
-  position: absolute !important;
-  inset: -8%;
-  width: 116% !important;
-  height: 116% !important;
-  opacity: 0.95;
-}
-.shader-page::after {
-  position: absolute;
-  z-index: -1;
-  inset: 0;
-  background: linear-gradient(
-    120deg,
-    rgba(18, 13, 23, 0.2),
-    rgba(18, 13, 23, 0.06)
-  );
-  content: "";
-  pointer-events: none;
-}
 .shader-control {
   border: 1px solid var(--line) !important;
   background: var(--paper-alt) !important;
   box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.16),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    0 8px 24px color-mix(in srgb, var(--ink) 16%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--paper) 12%, transparent);
   color: var(--ink) !important;
   transition:
     border-color 180ms ease,
@@ -77,21 +59,21 @@ button:disabled {
     background 180ms ease;
 }
 .shader-control::placeholder {
-  color: #98a2b3;
+  color: var(--muted);
 }
 .shader-control:focus {
   border-color: var(--accent) !important;
-  background: #fff !important;
+  background: var(--paper) !important;
   box-shadow:
-    0 0 0 4px rgba(217, 58, 70, 0.12),
-    0 10px 26px rgba(18, 13, 23, 0.1);
+    0 0 0 4px var(--accent-soft),
+    0 10px 26px color-mix(in srgb, var(--ink) 10%, transparent);
   outline: none;
 }
 .shader-button {
-  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  border: 1px solid color-mix(in srgb, var(--paper) 28%, transparent) !important;
   box-shadow:
-    0 10px 22px rgba(18, 13, 23, 0.16),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    0 10px 22px color-mix(in srgb, var(--ink) 16%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--paper) 12%, transparent);
   font-weight: 800;
   transition:
     transform 180ms ease,
@@ -101,8 +83,8 @@ button:disabled {
 .shader-button:hover {
   transform: translateY(-2px);
   box-shadow:
-    0 14px 28px rgba(18, 13, 23, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+    0 14px 28px color-mix(in srgb, var(--ink) 22%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--paper) 16%, transparent);
 }
 .shader-button:active {
   transform: translateY(0) scale(0.98);
@@ -111,43 +93,48 @@ button:disabled {
   background: var(--accent) !important;
 }
 .shader-button--accent:hover {
-  background: #b92d3a !important;
+  background: var(--accent) !important;
 }
 .shader-button--dark {
-  background: #172033 !important;
+  background: var(--navy2) !important;
 }
 .shader-button--dark:hover {
-  background: #0d111c !important;
+  background: var(--navy) !important;
 }
 .shader-button--light {
-  border-color: #cbd5e1 !important;
-  background: #fff !important;
-  color: #475569 !important;
+  border-color: var(--line) !important;
+  background: var(--paper) !important;
+  color: var(--ink) !important;
 }
 .shader-button--light:hover {
-  border-color: #e43d4b !important;
-  background: #fff5f6 !important;
-  color: #e43d4b !important;
+  border-color: var(--accent) !important;
+  background: var(--accent-soft) !important;
+  color: var(--accent) !important;
 }
 .shader-file::file-selector-button {
   cursor: pointer;
   border: 0;
   border-radius: 999px;
-  background: #172033;
+  background: var(--navy2);
   padding: 0.65rem 1rem;
-  color: white;
+  color: var(--paper);
   font-size: 0.75rem;
   font-weight: 800;
 }
 .app-shell {
-  background: #fff;
+  background: var(--paper);
 }
 .auth-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 }
 .auth-intro {
-  background: linear-gradient(145deg, #123d46, #0f766e 58%, #ef765b);
+  background: linear-gradient(
+    145deg,
+    var(--navy),
+    var(--navy2) 58%,
+    var(--accent)
+  );
 }
 .brand-mark {
   font-size: 1.35rem;
@@ -155,7 +142,7 @@ button:disabled {
   letter-spacing: -0.08em;
 }
 .brand-mark span {
-  color: var(--coral);
+  color: var(--accent);
 }
 .eyebrow {
   color: var(--accent);
@@ -168,7 +155,7 @@ button:disabled {
   display: flex;
   flex-direction: column;
   gap: 0.55rem;
-  color: #344054;
+  color: var(--ink);
   font-size: 0.85rem;
   font-weight: 700;
 }
@@ -176,7 +163,7 @@ button:disabled {
   width: 100%;
   border: 1px solid var(--line);
   border-radius: 0.9rem;
-  background: #fbfcfd;
+  background: var(--paper-alt);
   padding: 0.9rem 1rem;
   color: var(--ink);
   outline: none;
@@ -185,25 +172,25 @@ button:disabled {
     box-shadow 0.2s;
 }
 .field-input::placeholder {
-  color: #98a2b3;
+  color: var(--muted);
 }
 .field-input:focus {
-  border-color: #52a39c;
-  box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.12);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft);
 }
 .primary-button {
   border: 0;
   border-radius: 0.9rem;
   background: var(--accent);
   padding: 0.95rem 1.25rem;
-  color: white;
+  color: var(--paper);
   font-weight: 800;
   transition:
     background 0.2s,
     transform 0.2s;
 }
 .primary-button:hover {
-  background: var(--accent-dark);
+  background: var(--accent);
   transform: translateY(-1px);
 }
 .primary-button:disabled {
@@ -212,27 +199,70 @@ button:disabled {
 }
 .status-error {
   border-radius: 0.75rem;
-  background: #fff1f0;
+  background: var(--accent-soft);
   padding: 0.75rem 1rem;
-  color: #c2413a;
+  color: var(--accent);
   font-size: 0.84rem;
-}
-.shader-surface {
-  border: 1px solid var(--line);
-  background: var(--paper);
-  box-shadow:
-    0 14px 34px rgba(15, 23, 42, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  color: #172033;
 }
 .portal-page {
   min-height: 100vh;
   background: var(--paper);
   color: var(--ink);
-  font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+}
+.portal-nav-shell {
+  border-bottom: 1px solid var(--line);
+  padding: 1.25rem 1.5rem;
+}
+.portal-nav {
+  display: grid;
+  grid-template-columns: minmax(5rem, 1fr) auto minmax(5rem, 1fr);
+  align-items: center;
+  gap: 1.5rem;
+  margin: 0 auto;
+  max-width: 72rem;
+}
+.portal-nav-brand {
+  justify-self: start;
+}
+.portal-nav-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+}
+.portal-nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.portal-nav-login {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-self: end;
+  gap: 0.4rem;
+  color: var(--ink);
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: color 180ms ease;
+}
+.portal-nav-login svg {
+  color: var(--accent);
+}
+.portal-nav-login:hover {
+  color: var(--accent);
 }
 .portal-display {
-  font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
 }
 .portal-logo {
   display: inline-flex;
@@ -240,7 +270,7 @@ button:disabled {
   background: var(--accent);
   padding: 0.25rem 0.55rem;
   color: white;
-  font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
   font-size: 0.9rem;
   font-weight: 700;
   letter-spacing: -0.04em;
@@ -312,17 +342,67 @@ button:disabled {
   font-size: 0.75rem;
   font-weight: 700;
 }
+.portal-modal-backdrop {
+  position: fixed;
+  z-index: 50;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow-y: auto;
+  background: color-mix(in srgb, var(--navy) 45%, transparent);
+  padding: 1rem;
+}
+.portal-modal {
+  width: 100%;
+  max-width: 32rem;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: var(--paper);
+  padding: 1.5rem;
+  box-shadow: 0 24px 60px color-mix(in srgb, var(--navy) 22%, transparent);
+  animation: portal-modal-enter 180ms ease-out;
+}
+@keyframes portal-modal-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
 .shader-heading {
-  color: #172033 !important;
+  color: var(--navy2) !important;
 }
 .shader-muted {
-  color: #64748b !important;
+  color: var(--muted) !important;
 }
 .shader-label {
-  color: #334155 !important;
+  color: var(--ink) !important;
 }
 @media (max-width: 767px) {
   .auth-layout {
     display: block;
+  }
+  .portal-nav-shell {
+    padding: 1rem;
+  }
+  .portal-nav {
+    grid-template-columns: auto 1fr auto;
+    gap: 0.75rem;
+  }
+  .portal-nav-links {
+    gap: 0.65rem;
+  }
+  .portal-nav-link {
+    font-size: 0.58rem;
+    letter-spacing: 0.04em;
+  }
+  .portal-nav-login span {
+    display: none;
+  }
+  .portal-nav-login {
+    padding: 0.4rem;
   }
 }

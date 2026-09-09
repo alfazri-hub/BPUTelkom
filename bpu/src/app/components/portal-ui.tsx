@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+const PERFORATION_DOTS = Array.from({ length: 28 }, (_, index) => index);
+
 export function PortalLogo() {
   return (
     <span className="portal-logo" aria-label="BPU Portal Pajak">
@@ -11,8 +13,8 @@ export function PortalLogo() {
 export function Perforation() {
   return (
     <div className="perforation" aria-hidden="true">
-      {Array.from({ length: 28 }, (_, index) => (
-        <span key={index} />
+      {PERFORATION_DOTS.map((dot) => (
+        <span key={dot} />
       ))}
     </div>
   );

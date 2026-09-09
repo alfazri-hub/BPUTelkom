@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { clearAdminSession, hasAdminSession } from "@/lib/admin-session";
-import { LogOut, Plus } from "lucide-react";
+import { hasAdminSession } from "@/lib/admin-session";
+import { Plus } from "lucide-react";
 import { Eyebrow, Perforation } from "@/app/components/portal-ui";
+import { PortalNavigation } from "@/app/components/navigation-bar";
 
 export default function InputData() {
   const router = useRouter();
@@ -76,35 +77,26 @@ export default function InputData() {
   };
 
   return (
-    <main className="portal-page min-h-screen bg-[#f7f6f2] px-4 py-8 sm:px-6">
-      <div className="mx-auto w-full max-w-3xl">
-        <div className="mb-8 flex items-start justify-between gap-3 border-b border-gray-100 pb-6">
+    <main className="portal-page min-h-screen bg-portal-paper2">
+      <PortalNavigation admin />
+      <div className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6">
+        <div className="mb-8 flex items-start justify-between gap-3 border-b border-portal-line pb-6">
           <div>
             <Eyebrow>Ruang admin</Eyebrow>
-            <h1 className="portal-display mt-3 text-3xl font-semibold text-[#10132a]">
+            <h1 className="portal-display mt-3 text-3xl font-semibold text-portal-navy">
               Input dokumen baru
             </h1>
-            <p className="mt-2 text-sm text-[#75798c]">
+            <p className="mt-2 text-sm text-portal-muted">
               Unggah bukti potong dan lengkapi data administrasi.
             </p>
           </div>
           <div className="flex gap-2">
             <button
               onClick={() => router.push("/admin/data")}
-              className="portal-icon-button rounded-full border border-[#e7e4dd] bg-white px-3 py-2 text-xs"
+              className="portal-icon-button rounded-full border border-portal-line bg-portal-paper px-3 py-2 text-xs"
             >
               <Plus size={14} />
               Kelola data
-            </button>
-            <button
-              onClick={() => {
-                clearAdminSession();
-                router.replace("/login");
-              }}
-              className="portal-icon-button rounded-full border border-[#e7e4dd] bg-white px-3 py-2 text-xs"
-            >
-              <LogOut size={14} className="text-[#d93a46]" />
-              Keluar
             </button>
           </div>
           <button onClick={() => router.push("/admin")} className="hidden">
@@ -113,16 +105,16 @@ export default function InputData() {
         </div>
 
         {status === "sukses" ? (
-          <div className="mb-8 rounded-3xl border border-emerald-200 bg-emerald-50 p-5 text-center text-sm font-bold text-emerald-700">
+          <div className="mb-8 rounded-3xl border border-portal-line bg-portal-paper2 p-5 text-center text-sm font-bold text-portal-ink">
             Data dan PDF berhasil disimpan ke sistem!
           </div>
         ) : null}
 
         {status === "gagal_upload" ? (
-          <div className="mb-8 rounded-3xl border border-red-200 bg-red-50 p-5 text-center text-sm font-bold text-red-700">
+          <div className="mb-8 rounded-3xl border border-portal-line bg-portal-red-soft p-5 text-center text-sm font-bold text-portal-red">
             Gagal mengunggah file PDF. Silakan coba lagi.
             {errorMessage ? (
-              <p className="mt-2 text-xs font-medium text-slate-500">
+              <p className="mt-2 text-xs font-medium text-portal-muted">
                 {errorMessage}
               </p>
             ) : null}
@@ -130,10 +122,10 @@ export default function InputData() {
         ) : null}
 
         {status === "gagal_database" ? (
-          <div className="mb-8 rounded-3xl border border-red-200 bg-red-50 p-5 text-center text-sm font-bold text-red-700">
+          <div className="mb-8 rounded-3xl border border-portal-line bg-portal-red-soft p-5 text-center text-sm font-bold text-portal-red">
             Gagal menyimpan teks ke database. Pastikan Nomor Referensi unik.
             {errorMessage ? (
-              <p className="mt-2 text-xs font-medium text-slate-500">
+              <p className="mt-2 text-xs font-medium text-portal-muted">
                 {errorMessage}
               </p>
             ) : null}
@@ -215,9 +207,9 @@ export default function InputData() {
             </div>
           </div>
 
-          <div className="flex flex-col gap-2 rounded-xl border border-[#e7e4dd] bg-[#f7f6f2] p-4 md:col-span-2">
+          <div className="flex flex-col gap-2 rounded-xl border border-portal-line bg-portal-paper2 p-4 md:col-span-2">
             <label className="portal-label">Upload File PDF</label>
-            <p className="mb-2 text-sm text-[#75798c]">
+            <p className="mb-2 text-sm text-portal-muted">
               Pilih dokumen fisik bukti potong pajak dalam format PDF.
             </p>
             <input
@@ -227,14 +219,14 @@ export default function InputData() {
                 setFile(e.target.files ? e.target.files[0] : null)
               }
               required
-              className="shader-file w-full rounded-xl border border-[#e7e4dd] bg-white px-4 py-3 text-sm text-[#75798c]"
+              className="shader-file w-full rounded-xl border border-portal-line bg-portal-paper px-4 py-3 text-sm text-portal-muted"
             />
           </div>
 
           <button
             type="submit"
             disabled={status === "proses"}
-            className="mt-1 w-full rounded-xl bg-[#d93a46] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#b92d3a] disabled:opacity-50 md:col-span-2"
+            className="mt-1 w-full rounded-xl bg-portal-red px-6 py-3 text-sm font-semibold text-portal-paper transition hover:bg-portal-red disabled:opacity-50 md:col-span-2"
           >
             {status === "proses"
               ? "Menyimpan Data..."

@@ -65,8 +65,8 @@ export default function InputData() {
   };
 
   return (
-    <main className="min-h-screen bg-white px-4 py-5 sm:px-6">
-      <div className="mx-auto w-full max-w-2xl rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/70 sm:p-8">
+    <main className="min-h-screen bg-portal-paper px-4 py-5 sm:px-6">
+      <div className="mx-auto w-full max-w-2xl rounded-3xl border border-portal-line bg-portal-paper p-6 shadow-xl shadow-portal-ink/10 sm:p-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="shader-heading text-3xl font-extrabold tracking-tight">
             Input Dokumen Baru
@@ -80,13 +80,13 @@ export default function InputData() {
         </div>
 
         {status === "sukses" && (
-          <div className="mb-6 p-4 bg-green-100 text-green-700 rounded-xl text-center font-medium border border-green-200">
+          <div className="mb-6 rounded-xl border border-portal-line bg-portal-paper2 p-4 text-center font-medium text-portal-ink">
             Data dan PDF berhasil disimpan!
           </div>
         )}
 
         {status === "gagal" && (
-          <div className="mb-6 p-4 bg-red-100 text-red-700 rounded-xl text-center font-medium border border-red-200">
+          <div className="mb-6 rounded-xl border border-portal-line bg-portal-red-soft p-4 text-center font-medium text-portal-red">
             Terjadi kesalahan saat menyimpan data.
           </div>
         )}
@@ -153,14 +153,14 @@ export default function InputData() {
                 setFile(e.target.files ? e.target.files[0] : null)
               }
               required
-              className="shader-file w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-500"
+              className="shader-file w-full rounded-2xl border border-portal-line bg-portal-paper px-4 py-3 text-sm text-portal-muted"
             />
           </div>
 
           <button
             type="submit"
             disabled={status === "proses"}
-            className="shader-button shader-button--accent mt-6 w-full rounded-full px-6 py-4 text-sm text-white disabled:opacity-50"
+            className="shader-button shader-button--accent mt-6 w-full rounded-full px-6 py-4 text-sm text-portal-paper disabled:opacity-50"
           >
             {status === "proses" ? "Menyimpan..." : "Simpan Data & Upload PDF"}
           </button>
